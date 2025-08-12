@@ -1,0 +1,12 @@
+# Ignore secrets and local overrides
+/db.env
+.env
+
+# Editor/OS junk
+.DS_Store
+Thumbs.db
+
+# SQL backups and dumps
+*.bak
+*.sql.bak
+*.trn
