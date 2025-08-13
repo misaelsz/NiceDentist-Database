@@ -1,5 +1,6 @@
 -- NiceDentist Manager Database Creation Script
 -- This script creates the database and tables for the management system
+-- Users table is in the Auth database (NiceDentistAuthDb)
 
 -- Create database if it doesn't exist
 IF NOT EXISTS (SELECT name FROM sys.databases WHERE name = 'NiceDentistManagerDb')
@@ -16,33 +17,12 @@ GO
 USE NiceDentistManagerDb;
 GO
 
--- Create Users table (shared between customers and dentists)
-IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='Users' AND xtype='U')
-BEGIN
-    CREATE TABLE Users (
-        Id INT IDENTITY(1,1) PRIMARY KEY,
-        Username NVARCHAR(100) NOT NULL UNIQUE,
-        PasswordHash NVARCHAR(500) NOT NULL,
-        Email NVARCHAR(255) NOT NULL UNIQUE,
-        Role NVARCHAR(50) NOT NULL CHECK (Role IN ('Admin', 'Manager', 'Dentist', 'Customer')),
-        CreatedAt DATETIME2 NOT NULL DEFAULT GETUTCDATE(),
-        UpdatedAt DATETIME2 NOT NULL DEFAULT GETUTCDATE(),
-        IsActive BIT NOT NULL DEFAULT 1
-    );
-    PRINT 'Table Users created successfully.';
-END
-ELSE
-BEGIN
-    PRINT 'Table Users already exists.';
-END
-GO
-
--- Create Customers table
+-- Create Customers table (references Users in Auth DB)
 IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='Customers' AND xtype='U')
 BEGIN
     CREATE TABLE Customers (
         Id INT IDENTITY(1,1) PRIMARY KEY,
-        UserId INT NOT NULL,
+        UserId INT NOT NULL, -- References NiceDentistAuthDb.dbo.Users.Id
         FirstName NVARCHAR(100) NOT NULL,
         LastName NVARCHAR(100) NOT NULL,
         Phone NVARCHAR(20),
@@ -53,9 +33,7 @@ BEGIN
         MedicalNotes NVARCHAR(MAX),
         CreatedAt DATETIME2 NOT NULL DEFAULT GETUTCDATE(),
         UpdatedAt DATETIME2 NOT NULL DEFAULT GETUTCDATE(),
-        IsActive BIT NOT NULL DEFAULT 1,
-        
-        CONSTRAINT FK_Customers_Users FOREIGN KEY (UserId) REFERENCES Users(Id)
+        IsActive BIT NOT NULL DEFAULT 1
     );
     PRINT 'Table Customers created successfully.';
 END
@@ -65,12 +43,12 @@ BEGIN
 END
 GO
 
--- Create Dentists table
+-- Create Dentists table (references Users in Auth DB)
 IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='Dentists' AND xtype='U')
 BEGIN
     CREATE TABLE Dentists (
         Id INT IDENTITY(1,1) PRIMARY KEY,
-        UserId INT NOT NULL,
+        UserId INT NOT NULL, -- References NiceDentistAuthDb.dbo.Users.Id
         FirstName NVARCHAR(100) NOT NULL,
         LastName NVARCHAR(100) NOT NULL,
         LicenseNumber NVARCHAR(50) NOT NULL UNIQUE,
@@ -80,9 +58,7 @@ BEGIN
         Salary DECIMAL(10,2),
         CreatedAt DATETIME2 NOT NULL DEFAULT GETUTCDATE(),
         UpdatedAt DATETIME2 NOT NULL DEFAULT GETUTCDATE(),
-        IsActive BIT NOT NULL DEFAULT 1,
-        
-        CONSTRAINT FK_Dentists_Users FOREIGN KEY (UserId) REFERENCES Users(Id)
+        IsActive BIT NOT NULL DEFAULT 1
     );
     PRINT 'Table Dentists created successfully.';
 END
@@ -119,18 +95,6 @@ END
 GO
 
 -- Create indexes for better performance
-IF NOT EXISTS (SELECT * FROM sys.indexes WHERE name='IX_Users_Email')
-BEGIN
-    CREATE INDEX IX_Users_Email ON Users(Email);
-    PRINT 'Index IX_Users_Email created successfully.';
-END
-
-IF NOT EXISTS (SELECT * FROM sys.indexes WHERE name='IX_Users_Username')
-BEGIN
-    CREATE INDEX IX_Users_Username ON Users(Username);
-    PRINT 'Index IX_Users_Username created successfully.';
-END
-
 IF NOT EXISTS (SELECT * FROM sys.indexes WHERE name='IX_Customers_UserId')
 BEGIN
     CREATE INDEX IX_Customers_UserId ON Customers(UserId);
@@ -163,19 +127,5 @@ END
 
 GO
 
--- Insert seed data for testing
-IF NOT EXISTS (SELECT * FROM Users WHERE Username = 'admin')
-BEGIN
-    INSERT INTO Users (Username, PasswordHash, Email, Role) 
-    VALUES ('admin', '$2a$11$5jJ5j5j5j5j5j5j5j5j5j.abcdefghijklmnopqrstuvwxyz123456789', 'admin@nicedentist.com', 'Admin');
-    PRINT 'Admin user seeded successfully.';
-END
-
-IF NOT EXISTS (SELECT * FROM Users WHERE Username = 'manager')
-BEGIN
-    INSERT INTO Users (Username, PasswordHash, Email, Role) 
-    VALUES ('manager', '$2a$11$5jJ5j5j5j5j5j5j5j5j5j.abcdefghijklmnopqrstuvwxyz123456789', 'manager@nicedentist.com', 'Manager');
-    PRINT 'Manager user seeded successfully.';
-END
-
 PRINT 'NiceDentist Manager Database setup completed successfully!';
+PRINT 'Note: Users are managed in NiceDentistAuthDb. Use UserId to reference users.';

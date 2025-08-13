@@ -16,8 +16,56 @@ BEGIN
         Username NVARCHAR(100) NOT NULL UNIQUE,
         PasswordHash NVARCHAR(256) NOT NULL,
         Email NVARCHAR(256) NOT NULL UNIQUE,
-        Role NVARCHAR(50) NOT NULL,
+        Role NVARCHAR(50) NOT NULL CHECK (Role IN ('Admin', 'Manager', 'Dentist', 'Customer')),
         CreatedAt DATETIME NOT NULL DEFAULT GETDATE(),
+        UpdatedAt DATETIME NOT NULL DEFAULT GETDATE(),
         IsActive BIT NOT NULL DEFAULT 1
     );
+    PRINT 'Users table created successfully.';
 END
+GO
+
+-- Create indexes for better performance
+IF NOT EXISTS (SELECT * FROM sys.indexes WHERE name='IX_Users_Email')
+BEGIN
+    CREATE INDEX IX_Users_Email ON Users(Email);
+    PRINT 'Index IX_Users_Email created successfully.';
+END
+
+IF NOT EXISTS (SELECT * FROM sys.indexes WHERE name='IX_Users_Username')
+BEGIN
+    CREATE INDEX IX_Users_Username ON Users(Username);
+    PRINT 'Index IX_Users_Username created successfully.';
+END
+GO
+
+-- Insert seed data for testing
+IF NOT EXISTS (SELECT * FROM Users WHERE Username = 'admin')
+BEGIN
+    INSERT INTO Users (Username, PasswordHash, Email, Role) 
+    VALUES ('admin', '$2a$11$5jJ5j5j5j5j5j5j5j5j5j.abcdefghijklmnopqrstuvwxyz123456789', 'admin@nicedentist.com', 'Admin');
+    PRINT 'Admin user seeded successfully.';
+END
+
+IF NOT EXISTS (SELECT * FROM Users WHERE Username = 'manager')
+BEGIN
+    INSERT INTO Users (Username, PasswordHash, Email, Role) 
+    VALUES ('manager', '$2a$11$5jJ5j5j5j5j5j5j5j5j5j.abcdefghijklmnopqrstuvwxyz123456789', 'manager@nicedentist.com', 'Manager');
+    PRINT 'Manager user seeded successfully.';
+END
+
+IF NOT EXISTS (SELECT * FROM Users WHERE Username = 'dentist1')
+BEGIN
+    INSERT INTO Users (Username, PasswordHash, Email, Role) 
+    VALUES ('dentist1', '$2a$11$5jJ5j5j5j5j5j5j5j5j5j.abcdefghijklmnopqrstuvwxyz123456789', 'dentist1@nicedentist.com', 'Dentist');
+    PRINT 'Dentist user seeded successfully.';
+END
+
+IF NOT EXISTS (SELECT * FROM Users WHERE Username = 'customer1')
+BEGIN
+    INSERT INTO Users (Username, PasswordHash, Email, Role) 
+    VALUES ('customer1', '$2a$11$5jJ5j5j5j5j5j5j5j5j5j.abcdefghijklmnopqrstuvwxyz123456789', 'customer1@nicedentist.com', 'Customer');
+    PRINT 'Customer user seeded successfully.';
+END
+
+PRINT 'NiceDentist Auth Database setup completed successfully!';
