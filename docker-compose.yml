@@ -1,0 +1,81 @@
+services:
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    environment:
+      - ACCEPT_EULA=Y
+      - SA_PASSWORD=Your_strong_password123!
+    ports:
+      - "1433:1433"
+    volumes:
+      - mssqldata:/var/opt/mssql
+      - ./Scripts:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "/opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P Your_strong_password123! -C -Q 'SELECT 1' || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+    restart: unless-stopped
+    networks:
+      - nicedentist-network
+      - default
+
+  rabbitmq:
+    image: rabbitmq:3.13-management
+    environment:
+      - RABBITMQ_DEFAULT_USER=nicedentist
+      - RABBITMQ_DEFAULT_PASS=Your_rabbit_password123!
+      - RABBITMQ_DEFAULT_VHOST=/
+    ports:
+      - "5672:5672"   # AMQP port
+      - "15672:15672" # Management UI port
+    volumes:
+      - rabbitmqdata:/var/lib/rabbitmq
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+    restart: unless-stopped
+    networks:
+      - nicedentist-network
+      - default
+
+  db-init:
+    image: mcr.microsoft.com/mssql-tools:latest
+    depends_on:
+      sqlserver:
+        condition: service_healthy
+    environment:
+      - SA_PASSWORD=Your_strong_password123!
+    volumes:
+      - ./Scripts:/scripts:ro
+    command: >
+      /bin/sh -c "
+        echo 'SQL Server is ready. Starting database initialization...';
+        echo 'Creating Auth database...';
+        /opt/mssql-tools/bin/sqlcmd -S sqlserver -U sa -P Your_strong_password123! -Q 'IF NOT EXISTS (SELECT name FROM sys.databases WHERE name = ''NiceDentistAuthDb'') CREATE DATABASE NiceDentistAuthDb;';
+        echo 'Creating Manager database...';
+        /opt/mssql-tools/bin/sqlcmd -S sqlserver -U sa -P Your_strong_password123! -Q 'IF NOT EXISTS (SELECT name FROM sys.databases WHERE name = ''NiceDentistManagerDb'') CREATE DATABASE NiceDentistManagerDb;';
+        echo 'Running Auth database script...';
+        /opt/mssql-tools/bin/sqlcmd -S sqlserver -U sa -P Your_strong_password123! -d master -i /scripts/create_login_database.sql;
+        echo 'Running Manager database script...';
+        /opt/mssql-tools/bin/sqlcmd -S sqlserver -U sa -P Your_strong_password123! -d master -i /scripts/create_manager_database.sql;
+        echo 'Database initialization completed successfully!';
+        echo 'Verifying setup...';
+        /opt/mssql-tools/bin/sqlcmd -S sqlserver -U sa -P Your_strong_password123! -Q 'SELECT name FROM sys.databases WHERE name IN (''NiceDentistAuthDb'', ''NiceDentistManagerDb'')';
+        echo 'Setup complete. You can now connect to the databases.';
+      "
+    restart: "no"
+    networks:
+      - nicedentist-network
+      - default
+
+volumes:
+  mssqldata:
+  rabbitmqdata:
+
+networks:
+  nicedentist-network:
+    external: true
