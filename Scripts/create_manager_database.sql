@@ -22,7 +22,7 @@ IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='Customers' AND xtype='U')
 BEGIN
     CREATE TABLE Customers (
         Id INT IDENTITY(1,1) PRIMARY KEY,
-        UserId INT NULL, -- References NiceDentistAuthDb.dbo.Users.Id - will be set after account activation
+        UserId INT NULL,
         Name NVARCHAR(200) NOT NULL,
         Email NVARCHAR(255) NOT NULL UNIQUE,
         Phone NVARCHAR(20) NOT NULL,

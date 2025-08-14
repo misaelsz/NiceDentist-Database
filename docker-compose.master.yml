@@ -1,0 +1,8 @@
+# NiceDentist - Master Docker Compose
+# This file only includes all existing compose files
+
+include:
+  - path: ./NiceDentist-Infrastructure/docker-compose.yml
+  - path: ./NiceDentist - AuthAPI/docker-compose.yml
+  - path: ./NiceDentist-Manager/docker-compose.yml
+  - path: ./NiceDentist-Frontend/docker-compose.yml
