@@ -55,16 +55,16 @@ services:
       /bin/sh -c "
         echo 'SQL Server is ready. Starting database initialization...';
         echo 'Creating Auth database...';
-        /opt/mssql-tools/bin/sqlcmd -S sqlserver -U sa -P Your_strong_password123! -Q 'IF NOT EXISTS (SELECT name FROM sys.databases WHERE name = ''NiceDentistAuthDb'') CREATE DATABASE NiceDentistAuthDb;';
+        /opt/mssql-tools/bin/sqlcmd -S sqlserver -U sa -P Your_strong_password123! -C -Q 'IF NOT EXISTS (SELECT name FROM sys.databases WHERE name = ''NiceDentistAuthDb'') CREATE DATABASE NiceDentistAuthDb;';
         echo 'Creating Manager database...';
-        /opt/mssql-tools/bin/sqlcmd -S sqlserver -U sa -P Your_strong_password123! -Q 'IF NOT EXISTS (SELECT name FROM sys.databases WHERE name = ''NiceDentistManagerDb'') CREATE DATABASE NiceDentistManagerDb;';
+        /opt/mssql-tools/bin/sqlcmd -S sqlserver -U sa -P Your_strong_password123! -C -Q 'IF NOT EXISTS (SELECT name FROM sys.databases WHERE name = ''NiceDentistManagerDb'') CREATE DATABASE NiceDentistManagerDb;';
         echo 'Running Auth database script...';
-        /opt/mssql-tools/bin/sqlcmd -S sqlserver -U sa -P Your_strong_password123! -d master -i /scripts/create_login_database.sql;
+        /opt/mssql-tools/bin/sqlcmd -S sqlserver -U sa -P Your_strong_password123! -C -d master -i /scripts/create_login_database.sql;
         echo 'Running Manager database script...';
-        /opt/mssql-tools/bin/sqlcmd -S sqlserver -U sa -P Your_strong_password123! -d master -i /scripts/create_manager_database.sql;
+        /opt/mssql-tools/bin/sqlcmd -S sqlserver -U sa -P Your_strong_password123! -C -d master -i /scripts/create_manager_database.sql;
         echo 'Database initialization completed successfully!';
         echo 'Verifying setup...';
-        /opt/mssql-tools/bin/sqlcmd -S sqlserver -U sa -P Your_strong_password123! -Q 'SELECT name FROM sys.databases WHERE name IN (''NiceDentistAuthDb'', ''NiceDentistManagerDb'')';
+        /opt/mssql-tools/bin/sqlcmd -S sqlserver -U sa -P Your_strong_password123! -C -Q 'SELECT name FROM sys.databases WHERE name IN (''NiceDentistAuthDb'', ''NiceDentistManagerDb'')';
         echo 'Setup complete. You can now connect to the databases.';
       "
     restart: "no"
