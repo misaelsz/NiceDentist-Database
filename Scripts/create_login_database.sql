@@ -43,28 +43,28 @@ GO
 IF NOT EXISTS (SELECT * FROM Users WHERE Username = 'admin')
 BEGIN
     INSERT INTO Users (Username, PasswordHash, Email, Role) 
-    VALUES ('admin', '$2a$11$5jJ5j5j5j5j5j5j5j5j5j.abcdefghijklmnopqrstuvwxyz123456789', 'admin@nicedentist.com', 'Admin');
+    VALUES ('admin', '$2a$11$kOa.pQooDLK/A1.ymOJtPujdGQvPdjMMGXDrXlNHly8K65KXPuUYS', 'admin@nicedentist.com', 'Admin');
     PRINT 'Admin user seeded successfully.';
 END
 
 IF NOT EXISTS (SELECT * FROM Users WHERE Username = 'manager')
 BEGIN
     INSERT INTO Users (Username, PasswordHash, Email, Role) 
-    VALUES ('manager', '$2a$11$5jJ5j5j5j5j5j5j5j5j5j.abcdefghijklmnopqrstuvwxyz123456789', 'manager@nicedentist.com', 'Manager');
+    VALUES ('manager', '$2a$11$kOa.pQooDLK/A1.ymOJtPujdGQvPdjMMGXDrXlNHly8K65KXPuUYS', 'manager@nicedentist.com', 'Manager');
     PRINT 'Manager user seeded successfully.';
 END
 
 IF NOT EXISTS (SELECT * FROM Users WHERE Username = 'dentist1')
 BEGIN
     INSERT INTO Users (Username, PasswordHash, Email, Role) 
-    VALUES ('dentist1', '$2a$11$5jJ5j5j5j5j5j5j5j5j5j.abcdefghijklmnopqrstuvwxyz123456789', 'dentist1@nicedentist.com', 'Dentist');
+    VALUES ('dentist1', '$2a$11$kOa.pQooDLK/A1.ymOJtPujdGQvPdjMMGXDrXlNHly8K65KXPuUYS', 'dentist1@nicedentist.com', 'Dentist');
     PRINT 'Dentist user seeded successfully.';
 END
 
 IF NOT EXISTS (SELECT * FROM Users WHERE Username = 'customer1')
 BEGIN
     INSERT INTO Users (Username, PasswordHash, Email, Role) 
-    VALUES ('customer1', '$2a$11$5jJ5j5j5j5j5j5j5j5j5j.abcdefghijklmnopqrstuvwxyz123456789', 'customer1@nicedentist.com', 'Customer');
+    VALUES ('customer1', '$2a$11$kOa.pQooDLK/A1.ymOJtPujdGQvPdjMMGXDrXlNHly8K65KXPuUYS', 'customer1@nicedentist.com', 'Customer');
     PRINT 'Customer user seeded successfully.';
 END
 
