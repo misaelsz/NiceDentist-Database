@@ -73,7 +73,7 @@ BEGIN
         AppointmentDateTime DATETIME2 NOT NULL,
         ProcedureType NVARCHAR(300) NOT NULL,
         Notes NVARCHAR(MAX),
-        Status NVARCHAR(50) NOT NULL DEFAULT 'Scheduled' CHECK (Status IN ('Scheduled', 'Completed', 'Cancelled', 'CancellationRequested')),
+        Status INT NOT NULL DEFAULT 1 CHECK (Status IN (1, 2, 3, 4)),
         CreatedAt DATETIME2 NOT NULL DEFAULT GETUTCDATE(),
         UpdatedAt DATETIME2 NOT NULL DEFAULT GETUTCDATE(),
         
@@ -138,10 +138,10 @@ VALUES
 -- Insert seed data for Appointments
 INSERT INTO Appointments (CustomerId, DentistId, AppointmentDateTime, ProcedureType, Notes, Status)
 VALUES 
-    (1, 1, '2024-01-15 09:00:00', 'Consulta inicial + Limpeza', 'Primeira consulta da paciente', 'Scheduled'),
-    (1, 1, '2024-01-22 14:00:00', 'Instalação de aparelho ortodôntico', 'Iniciar tratamento ortodôntico', 'Scheduled'),
-    (2, 2, '2024-01-16 10:30:00', 'Tratamento de canal', 'Dor no molar superior direito', 'Scheduled'),
-    (3, 3, '2024-01-17 15:00:00', 'Avaliação para implante', 'Consulta para implante unitário', 'Scheduled');
+    (1, 1, '2024-01-15 09:00:00', 'Consulta inicial + Limpeza', 'Primeira consulta da paciente', 1),
+    (1, 1, '2024-01-22 14:00:00', 'Instalação de aparelho ortodôntico', 'Iniciar tratamento ortodôntico', 1),
+    (2, 2, '2024-01-16 10:30:00', 'Tratamento de canal', 'Dor no molar superior direito', 1),
+    (3, 3, '2024-01-17 15:00:00', 'Avaliação para implante', 'Consulta para implante unitário', 1);
 
 GO
 
